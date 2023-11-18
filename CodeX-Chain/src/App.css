@@ -1,0 +1,15 @@
+#root {
+  width: 100%;
+}
+
+main,
+header,
+footer {
+  max-width: var(--section-max-width-1);
+  padding-inline: var(--padding-inline);
+  /* border: 1px solid red; */
+}
+
+header {
+  margin-block-end: 20px;
+}

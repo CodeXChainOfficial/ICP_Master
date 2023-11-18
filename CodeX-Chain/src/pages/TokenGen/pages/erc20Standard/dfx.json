@@ -1,0 +1,7 @@
+{
+  "canisters": {
+    "token_33": {
+      "main": "src/token.mo"
+    }
+  }
+}
