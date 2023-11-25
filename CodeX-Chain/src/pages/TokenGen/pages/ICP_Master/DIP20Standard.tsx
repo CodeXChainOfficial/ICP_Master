@@ -254,7 +254,7 @@ const deploycansiter = async () => {
     if (!response.ok) {
       throw new Error('Error deploying token.');
     }
-    await new Promise(resolve => setTimeout(resolve, 30000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
   const result = await response.json();
  
@@ -503,6 +503,38 @@ const handleCloseTokenFunctionalityModal = () => {
 
 
 
+const styles = {
+  container: {
+    backgroundColor: '#0A192F', // Dark navy background
+    color: '#8892B0', // Slightly lighter text for contrast
+    padding: '20px',
+    borderRadius: '5px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  input: {
+    color: '#CCD6F6', // Light grey for input text
+    backgroundColor: '#112240', // Darker navy for the input background
+    border: '1px solid #2C5282', // Blue border
+    padding: '10px',
+    borderRadius: '5px',
+    width: '100%',
+    marginBottom: '10px'
+  },
+  button: {
+    backgroundColor: '#0D99FF', // Bright blue for the button
+    color: 'white',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '5px',
+    cursor: 'pointer'
+  },
+  text: {
+    backgroundColor: 'transparent',
+    padding: '5px 0'
+  }
+};
 
   return (
 
@@ -514,16 +546,19 @@ const handleCloseTokenFunctionalityModal = () => {
   <TotalCountDisplay />
     
 
-  <div>
+  <div style={styles.container}>
       <input
         type="text"
         value={nameID}
         onChange={(e) => setNameID(e.target.value)}
+        style={styles.input}
       />
-      <button onClick={handleCreateID}>Create ID</button>
-      <p> This ID is used for local and Test net only</p>
-      <p> Name : {nameID}</p>
-      <p> Principal: {identity}</p>
+      <button onClick={handleCreateID} style={styles.button}>
+        Create ID
+      </button>
+      <p style={styles.text}>This ID is used for local and Test net only</p>
+      <p style={styles.text}>Name: {nameID}</p>
+      <p style={styles.text}>Principal: {identity}</p>
     </div>
 
     <Tabs
