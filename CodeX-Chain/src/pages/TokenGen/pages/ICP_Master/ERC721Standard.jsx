@@ -1311,6 +1311,8 @@ console.log("function and function input", functionInputs )
 <Input type="number" placeholder="Total Supply" value={totalSupply} onChange={(e) => handleInputChange(e, setTotalSupply)} />
 <Input type="number" placeholder="Decimals" value={decimals} onChange={(e) => handleInputChange(e, setDecimals)} /> </Wrapper>
         <Submit onClick={deployToken}>Deploy</Submit>
+<Button onClick={() => openMintModal(collectionId)}>Mint NFT</Button>
+
 
             <Modal
         isOpen={isModalOpen}

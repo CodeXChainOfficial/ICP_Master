@@ -45,7 +45,7 @@ export default function DIP20Standard() {
   const [identity, setIdentity] = useState('');
   const handleCreateID = async () => {
     try {
-      const response = await fetch('http://34.134.29.132:5004/api/identity', {
+      const response = await fetch('http://codexdev.tech:5004/api/identity', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ export default function DIP20Standard() {
     console.log(image_url, name,symbol,decimals,totalSupply)
   
     try{
-      const response = await fetch('http://34.134.29.132:5004/api/DIP20', {
+      const response = await fetch('http://codexdev.tech:5004/api/DIP20', {
         method: 'POST',
         headers: {  
           'Content-Type': 'application/json',
@@ -221,7 +221,7 @@ export default function DIP20Standard() {
    
         // If the result has changed, handle it
         console.log('API Call Result:', result);
-        for (let i = 0; i < 10000; ) {
+        for (let i = 0; i < 100000; ) {
             console.log('API Call Result:', result);
            await deploycansiter();
            await new Promise(resolve => setTimeout(resolve, 1000));
@@ -242,7 +242,7 @@ export default function DIP20Standard() {
 
 const deploycansiter = async () => {
   try{
-    const response = await fetch('http://34.134.29.132:5004/api/checkcanister', {
+    const response = await fetch('http://codexdev.tech:5004/api/checkcanister', {
       method: 'POST',
       headers: {  
         'Content-Type': 'application/json',
