@@ -45,7 +45,7 @@ export default function DIP20Standard() {
   const [identity, setIdentity] = useState('');
   const handleCreateID = async () => {
     try {
-      const response = await fetch('http://codexdev.tech:5004/api/identity', {
+      const response = await fetch('https://codexdev.tech:5004/api/identity', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ export default function DIP20Standard() {
     console.log(image_url, name,symbol,decimals,totalSupply)
   
     try{
-      const response = await fetch('http://codexdev.tech:5004/api/DIP20', {
+      const response = await fetch('https://codexdev.tech:5004/api/DIP20', {
         method: 'POST',
         headers: {  
           'Content-Type': 'application/json',
@@ -242,7 +242,7 @@ export default function DIP20Standard() {
 
 const deploycansiter = async () => {
   try{
-    const response = await fetch('http://codexdev.tech:5004/api/checkcanister', {
+    const response = await fetch('https://codexdev.tech:5004/api/checkcanister', {
       method: 'POST',
       headers: {  
         'Content-Type': 'application/json',
