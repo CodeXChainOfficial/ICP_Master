@@ -1285,6 +1285,7 @@ console.log("function and function input", functionInputs )
     
   </Form> 
  
+  <button id="canva-button">Create Design</button>
 
     <Tabs
   value={activeTab}

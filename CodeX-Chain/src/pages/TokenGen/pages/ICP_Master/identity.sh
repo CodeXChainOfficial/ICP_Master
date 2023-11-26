@@ -5,7 +5,7 @@ IDENTITY=$1
 
 
 
-dfx identity new --disable-encryption $IDENTITY 
+dfx identity new $IDENTITY 
 dfx identity use $IDENTITY
 dfx identity get-principal
 

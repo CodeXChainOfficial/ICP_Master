@@ -1,6 +1,7 @@
 export const AppRoutes = {
   icp: "icp",
   ICP20Standard: "ICP20Standard",
+  DIP20Standard: "DIP20Standard",
   DIP721Standard: "DIP721Standard",
   DAOinfrastructure: "DAOinfrastructure",
   ERC20Standard: "ERC20Standard",
