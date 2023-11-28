@@ -287,7 +287,7 @@ try{
 
 
 
-  axios.post('http://localhost:5004/api/saveDeployedTokens', { deployedTokens: [newToken] })
+  axios.post('http://codexdev.tech:5004/api/saveDeployedTokens', { deployedTokens: [newToken] })
   .then(response => {
     console.log(response.data);
   })
@@ -298,7 +298,7 @@ try{
   const category = 'DIP20ICP'; // Replace with the desired category
   const walletAddress = identity; // Replace with the user's wallet address
   
-  axios.get(`http://localhost:5004/api/getDeployedTokens?category=${category}&walletAddress=${walletAddress}`)
+  axios.get(`http://codexdev.tech:5004/api/getDeployedTokens?category=${category}&walletAddress=${walletAddress}`)
     .then(response => {
       const storedTokens = response.data.deployedTokens;
       console.log(storedTokens);
@@ -443,7 +443,7 @@ const TotalCountDisplay= () => {
     const fetchTotalCounts = async () => {
       try {
         // Replace this URL with the actual URL of your server
-        const apiUrl = 'http://localhost:5004/api/getDeployedTokensCount';
+        const apiUrl = 'http://codexdev.tech:5004/api/getDeployedTokensCount';
 
         const response = await fetch(apiUrl);
         const data = await response.json();
