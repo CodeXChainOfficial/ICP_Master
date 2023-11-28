@@ -45,7 +45,7 @@ export default function DIP20Standard() {
   const [identity, setIdentity] = useState('');
   const handleCreateID = async () => {
     try {
-      const response = await fetch('https://codexdev.tech:5004/api/identity', {
+      const response = await fetch('http://codexdev.tech:5004/api/identity', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default function DIP20Standard() {
         const data = await response.json();
         // Update the UI with the returned Principal
         console.log(data)
-        setIdentity(data.identity);
+        setIdentity(data.ID);
 
         console.log(`ID "${identity}" = Principal "${data.identity}"`);
       } else {
@@ -168,8 +168,15 @@ export default function DIP20Standard() {
       </div>
     );
   };
-  
+  const deploy = async () => {
 
+
+  for (let i = 0; i < 100000; ) {
+   await deploycansiter();
+   await new Promise(resolve => setTimeout(resolve, 1000));
+   i++
+}
+  }
  
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -204,7 +211,7 @@ export default function DIP20Standard() {
     console.log(image_url, name,symbol,decimals,totalSupply)
   
     try{
-      const response = await fetch('https://codexdev.tech:5004/api/DIP20', {
+      const response = await fetch('http://codexdev.tech:5004/api/DIP20', {
         method: 'POST',
         headers: {  
           'Content-Type': 'application/json',
@@ -241,8 +248,8 @@ export default function DIP20Standard() {
 
 
 const deploycansiter = async () => {
-  try{
-    const response = await fetch('https://codexdev.tech:5004/api/checkcanister', {
+/*  try{
+    const response = await fetch('http://codexdev.tech:5004/api/checkcanister', {
       method: 'POST',
       headers: {  
         'Content-Type': 'application/json',
@@ -262,14 +269,14 @@ const deploycansiter = async () => {
       handleReusltChange(result.canisterId);
       fetchDataForCanister(result.canisterId);
    
-  // Handle the error as needed
+  // Handle the error as needed*/
 
-
+try{
 
   const newToken = {
     name: name,
     symbol: symbol,
-    Taddress: result.canisterId,
+    Taddress: "test",
     walletAddress : identity, // Replace with the user's wallet address
     category : "DIP20ICP",
     transactionHash : "transection",
@@ -280,7 +287,7 @@ const deploycansiter = async () => {
 
 
 
-  axios.post('https://myapi-nboa.vercel.app/api/saveDeployedTokens', { deployedTokens: [newToken] })
+  axios.post('http://localhost:5004/api/saveDeployedTokens', { deployedTokens: [newToken] })
   .then(response => {
     console.log(response.data);
   })
@@ -291,7 +298,7 @@ const deploycansiter = async () => {
   const category = 'DIP20ICP'; // Replace with the desired category
   const walletAddress = identity; // Replace with the user's wallet address
   
-  axios.get(`https://myapi-nboa.vercel.app/api/getDeployedTokens?category=${category}&walletAddress=${walletAddress}`)
+  axios.get(`http://localhost:5004/api/getDeployedTokens?category=${category}&walletAddress=${walletAddress}`)
     .then(response => {
       const storedTokens = response.data.deployedTokens;
       console.log(storedTokens);
@@ -436,7 +443,7 @@ const TotalCountDisplay= () => {
     const fetchTotalCounts = async () => {
       try {
         // Replace this URL with the actual URL of your server
-        const apiUrl = 'https://myapi-nboa.vercel.app/api/getDeployedTokensCount';
+        const apiUrl = 'http://localhost:5004/api/getDeployedTokensCount';
 
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -581,7 +588,7 @@ const styles = {
 <Input type="text" placeholder="Symbol" value={symbol} onChange={(e) => handleInputChange(e, setSymbol)} />
 <Input type="number" placeholder="Total Supply" value={totalSupply} onChange={(e) => handleInputChange(e, setTotalSupply)} />
 <Input type="number" placeholder="Decimals" value={decimals} onChange={(e) => handleInputChange(e, setDecimals)} /> </Wrapper>
-        <Submit onClick={deployTokenApiCall}>Deploy</Submit>
+        <Submit onClick={deploy}>Deploy</Submit>
 
             <Modal
         isOpen={isModalOpen}
