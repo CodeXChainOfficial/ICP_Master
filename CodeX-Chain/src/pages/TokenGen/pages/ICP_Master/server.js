@@ -7,33 +7,93 @@ import util from 'util';
 import { exec } from 'child_process';
 import fs from 'fs';
 import pg from 'pg'
-import mysql from 'mysql2/promise';
-
+import https from 'https'
 const app = express();
 const port = 5004;
-
-app.use(express.json());
-app.use(cors());
-app.use(bodyParser.json());
-
-const databaseConfig = {
-  host: 'codex1.cde9gjtj7yue.us-east-1.rds.amazonaws.com',
-  user: 'codex1',
-  password: '9LRs31mXqzW2aylZ3pfL',
-  database: 'codex1',
-  port: 3306
+const options = {
+  key: fs.readFileSync('privkey.pem'),
+  cert: fs.readFileSync('fullchain.pem'),
 };
 
-// Create a MySQL connection pool
-const pool = mysql.createPool(databaseConfig);
+const server = https.createServer(options, app);
+app.use(express.json());
+app.use(cors({
+  origin: 'https://codexdev.tech'
+}));
+app.use(bodyParser.json());
 
-// Check if the LastToken and LaunchPad tables exist and create them if not
+const DATABASE_URL = process.env.DATABASE_URL || 'postgres://postgres:1CCf63d-c25c3dgff1Cab6F2A5*C5cFC@roundhouse.proxy.rlwy.net:38917/railway';
+const { Client } = pg;
+
+const client = new Client({
+  connectionString: DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
+async function connectToDatabase() {
+  try {
+    await client.connect();
+    console.log('Connected to PostgreSQL database');
+  } catch (error) {
+    console.error('Error connecting to PostgreSQL database:', error);
+  }
+}
+
+connectToDatabase();
+
+
+// Check if the LastToken table exists and create it if not
 async function initDatabase() {
   try {
-    // Check for LastToken table
-    const [lastTokenRows] = await pool.query("SHOW TABLES LIKE 'LastToken'");
-    if (lastTokenRows.length === 0) {
-      await pool.query(`
+    const result = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'LastToken'
+      );
+    `);
+
+    const tableExists = result.rows[0].exists;
+
+    if (!tableExists) {
+
+
+
+      
+const launchPadTableExists = await client.query(`
+SELECT EXISTS (
+  SELECT FROM information_schema.tables 
+  WHERE table_name = 'LaunchPad'
+);
+
+`);
+
+
+
+if (!launchPadTableExists.rows[0].exists) {
+await client.query(`
+  CREATE TABLE LaunchPad (
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    wallet TEXT,
+    description TEXT,
+    logo TEXT,
+    launchPadType TEXT,
+    incubationNeeded BOOLEAN,
+    milestoneNeeded BOOLEAN,
+    generateDashboard BOOLEAN,
+    currency TEXT,
+    wallets JSONB,
+    walletVotingPower INT
+  );
+`);
+
+
+console.log('LaunchPad table created');
+}
+      // Create the LastToken table if it does not exist
+      await client.query(`
         CREATE TABLE LastToken (
           name TEXT,
           symbol TEXT,
@@ -43,29 +103,8 @@ async function initDatabase() {
           transactionHash TEXT
         );
       `);
-      console.log('LastToken table created');
-    }
 
-    // Check for LaunchPad table
-    const [launchPadRows] = await pool.query("SHOW TABLES LIKE 'LaunchPad'");
-    if (launchPadRows.length === 0) {
-      await pool.query(`
-        CREATE TABLE LaunchPad (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          name TEXT,
-          wallet TEXT,
-          description TEXT,
-          logo TEXT,
-          launchPadType TEXT,
-          incubationNeeded BOOLEAN,
-          milestoneNeeded BOOLEAN,
-          generateDashboard BOOLEAN,
-          currency TEXT,
-          wallets JSON, // Assuming MySQL 5.7.8 or later for JSON support
-          walletVotingPower INT
-        );
-      `);
-      console.log('LaunchPad table created');
+      console.log('LastToken table created');
     }
   } catch (error) {
     console.error('Error initializing database:', error);
@@ -73,6 +112,84 @@ async function initDatabase() {
 }
 
 initDatabase();
+
+
+
+app.post('/api/saveDeployedTokens', async (req, res) => {
+  const deployedTokens = req.body.deployedTokens;
+  console.log('Received request at post /api/saveDeployedTokens');
+
+  try {
+    for (const token of deployedTokens) {
+      await client.query('INSERT INTO LastToken VALUES ($1, $2, $3, $4, $5, $6)', [
+        token.name,
+        token.symbol,
+        token.Taddress,
+        token.walletAddress,
+        token.category,
+        token.transactionHash,
+      ]);
+    }
+
+    res.json({ success: true, message: 'Tokens saved successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error saving tokens.' });
+  }
+});
+
+// API endpoint to get deployed tokens based on category and walletAddress
+app.get('/api/getDeployedTokens', async (req, res) => {
+  const { category, walletAddress } = req.query;
+
+  try {
+    // Query the database based on category and walletAddress
+    console.log('Received request at get /api/getDeployedTokens');
+    console.log('Request query:', req.query);
+
+    let query = 'SELECT name, symbol, Taddress, walletAddress, category, "transactionhash" FROM LastToken';
+    const params = [];
+
+    if (category && walletAddress) {
+      query += ' WHERE category = $1 AND walletAddress = $2';
+      params.push(category, walletAddress);
+    } else if (category) {
+      query += ' WHERE category = $1';
+      params.push(category);
+    } else if (walletAddress) {
+      query += ' WHERE walletAddress = $2';
+      params.push(walletAddress);
+    }
+
+    const result = await client.query(query, params);
+    const storedTokens = result.rows;
+
+    if (storedTokens.length === 0) {
+      // No tokens found
+      res.json({ success: true, message: 'No tokens found for the given category and wallet address.', deployedTokens: [] });
+    } else {
+      // Tokens found
+      res.json({ success: true, deployedTokens: storedTokens });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error retrieving tokens.' });
+  }
+});
+
+
+app.get('/api/getDeployedTokensCount', async (req, res) => {
+  try {
+    const result = await client.query('SELECT COUNT(*) as count FROM LastToken');
+    const lasttokensCount = result.rows[0].count;
+
+    res.json({ success: true, tokensCount: lasttokensCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error retrieving token count.' });
+  }
+});
+
 
 const executeScript = async (scriptPath, args) => {
   try {
@@ -103,11 +220,13 @@ const executeBashIdentity = async (identity) => {
     throw error; // Rethrow the error to handle it in the calling function
   }
 };
+
 app.post('/api/saveLaunchPadData', async (req, res) => {
   const launchPadData = req.body;
 
   try {
-    await pool.query('INSERT INTO LaunchPad (name, wallet, description, logo, launchPadType, incubationNeeded, milestoneNeeded, generateDashboard, currency, wallets, walletVotingPower) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+    // Assuming you have a LaunchPad table in your database
+    await client.query('INSERT INTO LaunchPad (name, wallet, description, logo, launchPadType, incubationNeeded, milestoneNeeded, generateDashboard, currency, wallets, walletVotingPower) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [
       launchPadData.name,
       launchPadData.wallet,
       launchPadData.description,
@@ -117,7 +236,7 @@ app.post('/api/saveLaunchPadData', async (req, res) => {
       launchPadData.milestoneNeeded,
       launchPadData.generateDashboard,
       launchPadData.currency,
-      JSON.stringify(launchPadData.wallets),
+      JSON.stringify(launchPadData.wallets), // Assuming wallets is an array
       launchPadData.walletVotingPower,
     ]);
 
@@ -125,71 +244,6 @@ app.post('/api/saveLaunchPadData', async (req, res) => {
   } catch (error) {
     console.error('Error saving LaunchPad data:', error);
     res.status(500).json({ success: false, message: 'Error saving LaunchPad data.' });
-  }
-});
-app.post('/api/saveDeployedTokens', async (req, res) => {
-  const deployedTokens = req.body.deployedTokens;
-
-  try {
-    for (const token of deployedTokens) {
-      await pool.query('INSERT INTO LastToken (name, symbol, Taddress, walletAddress, category, transactionHash) VALUES (?, ?, ?, ?, ?, ?)', [
-        token.name,
-        token.symbol,
-        token.Taddress,
-        token.walletAddress,
-        token.category,
-        token.transactionHash,
-      ]);
-    }
-
-    res.json({ success: true, message: 'Tokens saved successfully.' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error saving tokens.' });
-  }
-});
-
-app.get('/api/getDeployedTokens', async (req, res) => {
-  const { category, walletAddress } = req.query;
-
-  try {
-    let query = 'SELECT name, symbol, Taddress, walletAddress, category, transactionHash FROM LastToken';
-    const params = [];
-
-    if (category && walletAddress) {
-      query += ' WHERE category = ? AND walletAddress = ?';
-      params.push(category, walletAddress);
-    } else if (category) {
-      query += ' WHERE category = ?';
-      params.push(category);
-    } else if (walletAddress) {
-      query += ' WHERE walletAddress = ?';
-      params.push(walletAddress);
-    }
-
-    const [storedTokens] = await pool.query(query, params);
-
-    if (storedTokens.length === 0) {
-      res.json({ success: true, message: 'No tokens found for the given category and wallet address.', deployedTokens: [] });
-    } else {
-      res.json({ success: true, deployedTokens: storedTokens });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error retrieving tokens.' });
-  }
-});
-
-
-app.get('/api/getDeployedTokensCount', async (req, res) => {
-  try {
-    const [result] = await pool.query('SELECT COUNT(*) as count FROM LastToken');
-    const lasttokensCount = result[0].count;
-
-    res.json({ success: true, tokensCount: lasttokensCount });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error retrieving token count.' });
   }
 });
 
@@ -255,22 +309,22 @@ app.post('/api/dip20', async (req, res) => {
   }
 });
 
-app.post('/api/identity', async (req, res) => {
-  const { identity} = req.body;
-  try {
-    // Execute the script with the provided data
-    // You might need to modify this based on your script
-    await executeBashIdentity(identity);
+  app.post('/api/identity', async (req, res) => {
+    const { identity} = req.body;
+    try {
+      // Execute the script with the provided data
+      // You might need to modify this based on your script
+      await executeBashIdentity(identity);
 
-    // Read Canister ID from the file
-    const ID = fs.readFileSync('ID-id-file', 'utf8').trim();
+      // Read Canister ID from the file
+      const ID = fs.readFileSync('ID-id-file', 'utf8').trim();
 
-    res.json({ success: true, message: 'New Idendity created.', ID });
-  } catch (error) {
-    console.error('Error deploying token:', error);
-    res.status(500).json({ success: false, message: 'Error create identity.' });
-  }
-});
+      res.json({ success: true, message: 'New Idendity created.', ID });
+    } catch (error) {
+      console.error('Error deploying token:', error);
+      res.status(500).json({ success: false, message: 'Error create identity.' });
+    }
+  });
 
 
 
