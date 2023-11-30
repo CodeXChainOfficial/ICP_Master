@@ -2,19 +2,30 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import cors from 'cors';
 import util from 'util';
 import { exec } from 'child_process';
 import fs from 'fs';
 import pg from 'pg'
+import https from 'https'
 
 
 const app = express();
 const port = 5004;
+const options = {
+  key: fs.readFileSync('privkey.pem'),
+  cert: fs.readFileSync('fullchain.pem')
+};
 
 app.use(express.json());
-app.use(cors());
 
+
+app.get('/', (req, res) => {
+  res.send('Hello, HTTPS!');
+});
+
+https.createServer(options, app).listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
 
 
 
