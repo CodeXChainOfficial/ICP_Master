@@ -155,7 +155,7 @@ const executeBashIdentity = async (identity) => {
     throw error; // Rethrow the error to handle it in the calling function
   }
 };
-app.post('/api/saveDeployedTokens', async (req, res) => {
+app.post('/saveDeployedTokens', async (req, res) => {
   const deployedTokens = req.body.deployedTokens;
   console.log('Received request at post /api/saveDeployedTokens');
 
@@ -179,7 +179,7 @@ app.post('/api/saveDeployedTokens', async (req, res) => {
 });
 
 // API endpoint to get deployed tokens based on category and walletAddress
-app.get('/api/getDeployedTokens', async (req, res) => {
+app.get('/getDeployedTokens', async (req, res) => {
   const { category, walletAddress } = req.query;
 
   try {
@@ -218,7 +218,7 @@ app.get('/api/getDeployedTokens', async (req, res) => {
 });
 
 
-app.get('/api/getDeployedTokensCount', async (req, res) => {
+app.get('/getDeployedTokensCount', async (req, res) => {
   try {
     const result = await client.query('SELECT COUNT(*) as count FROM LastToken');
     const lasttokensCount = result.rows[0].count;
@@ -233,7 +233,7 @@ app.get('/api/getDeployedTokensCount', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-app.post('/api/saveLaunchPadData', async (req, res) => {
+app.post('/saveLaunchPadData', async (req, res) => {
   const launchPadData = req.body;
 
   try {
@@ -278,7 +278,7 @@ const executeBash = async (image_url, decimals, totalsupply, name, symbol, princ
 
 // ... (previous code)
 
-app.post('/api/dip20', async (req, res) => {
+app.post('/dip20', async (req, res) => {
   const { image_url, identity, name, symbol, decimals, totalSupply } = req.body;
 
   try {
@@ -321,7 +321,7 @@ app.post('/api/dip20', async (req, res) => {
   }
 });
 
-  app.post('/api/identity', async (req, res) => {
+  app.post('/identity', async (req, res) => {
     const { identity} = req.body;
     try {
       // Execute the script with the provided data
