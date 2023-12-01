@@ -10,7 +10,7 @@ import https from 'https'
 
 
 const app = express();
-const port = 5004;
+const port = 5005;
 const options = {
   key: fs.readFileSync('privkey.pem'),
   cert: fs.readFileSync('fullchain.pem')
@@ -228,10 +228,6 @@ app.get('/getDeployedTokensCount', async (req, res) => {
     console.error(error);
     res.status(500).json({ success: false, message: 'Error retrieving token count.' });
   }
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
 });
 app.post('/saveLaunchPadData', async (req, res) => {
   const launchPadData = req.body;

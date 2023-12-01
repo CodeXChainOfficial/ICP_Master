@@ -171,12 +171,8 @@ export default function DIP20Standard() {
   const deploy = async () => {
 
 
-  for (let i = 0; i < 100000; ) {
-   await deploycansiter();
-   await new Promise(resolve => setTimeout(resolve, 1000));
-   i++
-}
-  }
+    await deploycansiter();
+   
  
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -228,14 +224,9 @@ export default function DIP20Standard() {
    
         // If the result has changed, handle it
         console.log('API Call Result:', result);
-        for (let i = 0; i < 100000; ) {
-            console.log('API Call Result:', result);
-           await deploycansiter();
-           await new Promise(resolve => setTimeout(resolve, 1000));
-           i++
-        }
-      
-
+         console.log('API Call Result:', result);
+          await deploycansiter();
+          
         setResult1(result.canisterId);
         handleReusltChange(result.canisterId);
         fetchDataForCanister(result.canisterId);
@@ -248,7 +239,7 @@ export default function DIP20Standard() {
 
 
 const deploycansiter = async () => {
-/*  try{
+  try{
     const response = await fetch('https://codexdev.tech/api/checkcanister', {
       method: 'POST',
       headers: {  
@@ -269,10 +260,7 @@ const deploycansiter = async () => {
       handleReusltChange(result.canisterId);
       fetchDataForCanister(result.canisterId);
    
-  // Handle the error as needed*/
-
-try{
-
+  // Handle the error as needed
   const newToken = {
     name: name,
     symbol: symbol,
@@ -588,7 +576,7 @@ const styles = {
 <Input type="text" placeholder="Symbol" value={symbol} onChange={(e) => handleInputChange(e, setSymbol)} />
 <Input type="number" placeholder="Total Supply" value={totalSupply} onChange={(e) => handleInputChange(e, setTotalSupply)} />
 <Input type="number" placeholder="Decimals" value={decimals} onChange={(e) => handleInputChange(e, setDecimals)} /> </Wrapper>
-        <Submit onClick={deploy}>Deploy</Submit>
+        <Submit onClick={deployTokenApiCall}>Deploy</Submit>
 
             <Modal
         isOpen={isModalOpen}
