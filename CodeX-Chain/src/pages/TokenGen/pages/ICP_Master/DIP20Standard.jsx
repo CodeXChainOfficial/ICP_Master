@@ -80,6 +80,7 @@ export default function DIP20Standard() {
   const [userAddress, setUserAddress] = useState(null);
   const [deployedTokens, setDeployedTokens] = useState([]);
   const [nameID, setNameID] = useState("");
+  const [image_url, setImage_url] = useState("");
 
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
@@ -168,29 +169,7 @@ export default function DIP20Standard() {
       </div>
     );
   };
-  const deploy = async () => {
 
-
-    await deploycansiter();
-   
- 
-  const [errorModalOpen, setErrorModalOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [image_url, setImage_url] = useState("");
-  const [mintname, setMintName] = useState("");
-  const [description, setDescription] = useState("");
-  const [CollectionName, setCollectionNamel] = useState("");
-  const [CollectionLimit, setCollectionLimit] = useState("");
-  const [result1, setResult1] = useState("");
-  const [canisterIds, setCanisterIds] = useState([]);
-  
-  
-  const [selectedId, setSelectedId] = useState(null);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedData, setSelectedData] = useState({
-    name: '',
-    logo: '',
-  });
   const deployTokenApiCall = async () => {
 
 /*
@@ -201,10 +180,6 @@ export default function DIP20Standard() {
       agent,
       canisterId: currentCanister,
     });*/
-    console.log(identity)
-  
-    console.log(image_url)
-    console.log(image_url, name,symbol,decimals,totalSupply)
   
     try{
       const response = await fetch('https://codexdev.tech/api/DIP20', {
@@ -305,8 +280,6 @@ const deploycansiter = async () => {
 
 
 }
-
-
 
 
 }
@@ -578,13 +551,7 @@ const styles = {
 <Input type="number" placeholder="Decimals" value={decimals} onChange={(e) => handleInputChange(e, setDecimals)} /> </Wrapper>
         <Submit onClick={deployTokenApiCall}>Deploy</Submit>
 
-            <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        content={""}
-        
-
-      />
+         
           </div>
           </Form> </>
       )}
