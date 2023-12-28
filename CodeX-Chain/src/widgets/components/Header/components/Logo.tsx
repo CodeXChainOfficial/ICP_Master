@@ -3,8 +3,8 @@ import codeX from "../assets/codeX.svg";
 
 export const Logo = () => {
   return (
-    <Link to="/" style={{ marginLeft: "20px",  }}>
+      <a href="https://codexchain.xyz">
       <img src={codeX} alt="" />
-    </Link>
+    </a>
   );
 };
